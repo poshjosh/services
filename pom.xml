@@ -60,8 +60,10 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
         <it.skip>false</it.skip>
+        <app.port>8080</app.port>
     </properties>
 
     <dependencyManagement>
@@ -69,7 +71,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.2.2.RELEASE</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -104,14 +106,133 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>        
+        <plugins>
+            <!-- Spring Boot configures surefire plugin by default, but not failsafe -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <skip>${it.skip}</skip>
+                </configuration>                
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${it.skip}</skip>
+                        </configuration>                
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <profiles>
         <profile>
-            <id>ci-environment</id>
+            <id>dev</id>
+            <properties>
+                <activatedProfile>dev</activatedProfile>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <activatedProfile>prod</activatedProfile>
+            </properties>
+        </profile>
+        <profile>
+            <id>fabric8</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>build.environment</name>
-                    <value>jenkins</value>
+                    <name>build.env</name>
+                    <value>fabric8</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.31.0</version>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skip>${it.skip}</skip>
+                            <images>
+                                <image>
+                                    <name>${project.groupId}/${project.artifactId}:${project.version}</name>
+                                    <build>
+                                        <dockerFile>${project.basedir}/Dockerfile</dockerFile >
+                                    </build>
+                                    <run>
+                                        <ports>
+                                            <port>${app.port}:${app.port}</port>
+                                        </ports>
+                                        <wait>
+                                            <!-- Wait for this URL to return a 200 return code -->
+                                            <url>http://localhost:${app.port}</url>
+                                            <time>120000</time>
+                                        </wait>     
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>                    
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>dockermaven</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>build.env</name>
+                    <value>dockermaven</value>
                 </property>
             </activation>
             <build>
@@ -173,45 +294,4 @@
             </build>
         </profile>
     </profiles>
-    <build>
-        <plugins>
-            <!-- Spring Boot configures surefire plugin by default, but not failsafe -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <skip>${it.skip}</skip>
-                </configuration>                
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.2.2.RELEASE</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${it.skip}</skip>
-                        </configuration>                
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>
