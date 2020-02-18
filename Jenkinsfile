@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script{
                     bat "cd %M2_HOME%/bin"
-                    bat "mvn clean package"
+                    bat "mvn package"
                 }
             }
         }
