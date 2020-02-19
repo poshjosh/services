@@ -48,12 +48,13 @@
             <timezone>Africa/Lagos</timezone>
         </developer>
     </developers>
-
+<!--
     <modules>
         <module>../bcsafecontentservice</module>
         <module>../cometdchatservice</module>
         <module>../discoveryserver</module>
     </modules>
+-->    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
