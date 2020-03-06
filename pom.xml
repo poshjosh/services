@@ -63,8 +63,16 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
-        <it.skip>false</it.skip>
+        <it.skip>true</it.skip>
+        <tests.skip>false</tests.skip>
         <app.port>8080</app.port>
+        <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
+        <maven.project.reports.plugin.version>3.0.0</maven.project.reports.plugin.version>
+        <pmd.version>3.12.0</pmd.version>
+        <spotbugs.version>3.1.12.2</spotbugs.version>
+        <jacoco.version>0.8.5</jacoco.version>
+        <maven.failsafle.plugin.version>2.22.2</maven.failsafle.plugin.version>
+        <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -115,11 +123,41 @@
             </resource>
         </resources>        
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven.site.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven.project.reports.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Spring Boot configures surefire plugin by default, but not failsafe -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${maven.failsafle.plugin.version}</version>
                 <configuration>
                     <skip>${it.skip}</skip>
                 </configuration>                
@@ -135,7 +173,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <skip>${tests.skip}</skip>
+                </configuration>                
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -143,17 +184,63 @@
                 <version>${spring-boot.version}</version>
                 <executions>
                     <execution>
+                        <id>pre-integration-test</id>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>start</goal>
                         </goals>
                         <configuration>
                             <skip>${it.skip}</skip>
-                        </configuration>                
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${it.skip}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${pmd.version}</version>
+                <configuration>
+                    <linkXref>true</linkXref>
+                    <sourceEncoding>utf-8</sourceEncoding>
+                    <minimumTokens>100</minimumTokens>
+                    <targetJdk>${java.version}</targetJdk>
+                    <excludes>
+                        <exclude>**/*Bean.java</exclude>
+                        <exclude>**/generated/*.java</exclude>
+                    </excludes>
+                    <excludeRoots>
+                        <excludeRoot>target/generated-sources/stubs</excludeRoot>
+                    </excludeRoots>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs.version}</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
     <profiles>
         <profile>
             <id>dev</id>
