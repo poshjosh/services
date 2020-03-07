@@ -11,11 +11,6 @@
  */
 def IMAGE_NAME = 'poshjosh/services:latest'
 pipeline {
-    environment {
-        ARTIFACTID = readMavenPom().getArtifactId()    
-        VERSION = readMavenPom().getVersion()
-        IMAGE_NAME = "poshjosh/$ARTIFACTID:$VERSION"
-    }
     agent { 
         dockerfile {
             filename 'Dockerfile'
@@ -35,11 +30,6 @@ pipeline {
         pollSCM('H 6-18/4 * * 1-5')
     }
     stages {
-        stage('Preparation') {
-            steps {
-                sh 'echo "Running jenkins pipeline for image: ${IMAGE_NAME}"'
-            }
-        }
         stage('Clean') {
             steps {
                 sh 'mvn -B clean'
@@ -108,8 +98,8 @@ pipeline {
         always {
             sh "if rm -rf target; then echo 'target dir removed'; else echo 'failed to remove target dir'; fi"
         }
-        failure {    
-            mail(to: 'posh.bc@gmail.com', subject: "Failed Jenkins Pipeline", body: "Status: Failed, Image: ${IMAGE_NAME}")
-        }
+//        failure {    
+//            mail(to: 'posh.bc@gmail.com', subject: "Failed Jenkins Pipeline", body: "Status: Failed, Image: ${IMAGE_NAME}")
+//        }
     }
 }
