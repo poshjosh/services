@@ -30,14 +30,9 @@ pipeline {
         pollSCM('H 6-18/4 * * 1-5')
     }
     stages {
-        stage('Clean') {
+        stage('Clean & Build') {
             steps {
-                sh 'mvn -B clean'
-            }
-        }
-        stage('Build') {
-            steps {
-                sh 'mvn -B compile'
+                sh 'mvn -B clean compile'
             }
         }
         stage('Unit Tests') {
@@ -51,22 +46,22 @@ pipeline {
                 }
             }
         }
-        stage('Sanity Check') {
-            steps {
-                sh 'mvn -B checkstyle:checkstyle pmd:pmd pmd:cpd com.github.spotbugs:spotbugs-maven-plugin:spotbugs'    
-            }
-        }
         stage('Quality Analysis') {
-            environment {
-                SONAR = credentials('sonar-creds') // Must have been specified in Jenkins
-            }
-            parallel {  // run Integration Tests and Sonar Scan in parallel
+            parallel {  
                 stage ('Integration Tests') {
                     steps {
                         sh 'mvn -B failsafe:integration-test failsafe:verify'
                     }
                 }
+                stage('Sanity Check') {
+                    steps {
+                        sh 'mvn -B checkstyle:checkstyle pmd:pmd pmd:cpd com.github.spotbugs:spotbugs-maven-plugin:spotbugs'    
+                    }
+                }
                 stage('Sonar Scan') {
+                    environment {
+                        SONAR = credentials('sonar-creds') // Must have been specified in Jenkins
+                    }
                     steps {
                         sh "mvn sonar:sonar -Dsonar.login=$SONAR_USR -Dsonar.password=$SONAR_PSW"
                     }
