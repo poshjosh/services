@@ -38,10 +38,7 @@ pipeline {
         }
         stage('Reports') {
             steps {
-                sh '''
-                    "mvn site"
-                    "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=admin"    
-                '''    
+                sh 'mvn site'    
             }
         }
         stage('Clean Up') {
