@@ -35,9 +35,9 @@ pipeline {
         pollSCM('H 6-18/4 * * 1-5')
     }
     stages {
-        stage('Preparing') {
+        stage('Preparation') {
             steps {
-                "echo Running jenkins pipeline for image: ${IMAGE_NAME}"
+                sh 'echo "Running jenkins pipeline for image: ${IMAGE_NAME}"'
             }
         }
         stage('Clean') {
