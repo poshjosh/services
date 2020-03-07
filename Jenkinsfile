@@ -39,7 +39,7 @@ pipeline {
         stage('Reports') {
             steps {
                 sh '''
-                    "mvn site:site"
+                    "mvn site"
                     "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=admin"    
                 '''    
             }
