@@ -25,10 +25,10 @@ pipeline {
         skipStagesAfterUnstable()
 //        disableConcurrentBuilds()
     }
-    triggers {
-        // MINUTE HOUR DOM MONTH DOW
-        pollSCM('H 6-18/4 * * 1-5')
-    }
+//    triggers {
+// MINUTE HOUR DOM MONTH DOW
+//        pollSCM('H 6-18/4 * * 1-5')
+//    }
     stages {
         stage('Clean & Build') {
             steps {
