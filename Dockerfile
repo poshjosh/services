@@ -4,6 +4,7 @@
 # Pull base image
 # ---------------
 FROM maven:3-alpine
+MAINTAINER Chinomso Ikwuagwu posh.bc@gmail.com
 # ---------------
 # Create and use non-root user
 # ---------------
