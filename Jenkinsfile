@@ -31,12 +31,14 @@ pipeline {
     stages {
         stage('All') {
             stages{
-                stage('Clean & Install') {
-                    agent 'maven:3-alpine'
-                    steps {
-                        sh 'mvn -B install'
-                    }    
-                }
+//                stage('Clean & Install') {
+//                    agent {
+//                        docker { image 'maven:3-alpine' }
+//                    }
+//                    steps {
+//                        sh 'mvn -B install'
+//                    }    
+//                }
                 stage('Build & Deploy Image') {
                     agent {
                         dockerfile {
