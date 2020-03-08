@@ -31,39 +31,28 @@ pipeline {
     }
     stages {
         stage('All') {
-            stages{
-//                stage('Clean & Install') {
-//                    agent {
-//                        docker { image 'maven:3-alpine' }
-//                    }
-//                    steps {
-//                        sh 'mvn -B install'
-//                    }    
-//                }
-                stage('Build & Deploy Image') {
-                    environment {
-                        PATH = "/usr/bin/docker:$PATH"
-                    }
-                    agent {
-                        dockerfile {
-                            filename 'Dockerfile'
-                            registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                            args '-v /usr/bin/docker:/usr/bin/docker -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
-                            additionalBuildArgs "-t ${IMAGE_NAME}"
-                        }
-                    }
-                    steps {
-                        script {
-                            docker.withRegistry('', 'dockerhub-creds') {
-
-                                def customImage = docker.build("${IMAGE_NAME}")
-
-                                /* Push the container to the custom Registry */
-                                customImage.push()
-                            }
-                        }
-                    }
+            agent {
+                dockerfile {
+                    filename 'Dockerfile'
+                    registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
+                    args '-v /usr/bin/docker:/usr/bin/docker -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                    additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
+            }
+            stages{
+                stage('Clean & Install') {
+                    steps {
+                        sh 'mvn -B clean install'
+                    }    
+                }
+//                stage('Deploy Image') {
+//                    steps {
+//                        sh '''
+//                            "docker login --username REGISTRY_USR --password REGISTRY_PSW"
+//                            "docker push $IMAGE_NAME"
+//                        '''
+//                    }
+//                }
             }
         }
     }
