@@ -9,9 +9,14 @@
  * run, and jenkins will complain about not being able to remove the container if
  * already removed due to --rm option in args.
  */
-def IMAGE_NAME = 'poshjosh/services:latest'
+//def IMAGE_NAME = 'poshjosh/services:latest'
 pipeline {
-    agent none
+    agent any
+    environment {
+        IMAGE = readMavenPom().getArtifactId()
+        VERSION = readMavenPom().getVersion()
+        IMAGE_NAME = "${IMAGE}:${VERSION}" 
+    }
     options {
         timeout(time: 2, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '4'))
@@ -28,6 +33,7 @@ pipeline {
                 docker { image 'maven:3-alpine' }
             }
             steps {
+                echo "IMAGE_NAME = $IMAGE_NAME"
                 sh 'mvn -B install'
             }
         }
