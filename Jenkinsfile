@@ -18,26 +18,18 @@ pipeline {
         IMAGE_NAME = "${IMAGE}:${VERSION}" 
     }
     options {
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 1, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '4'))
         skipStagesAfterUnstable()
-//        disableConcurrentBuilds()
+        disableConcurrentBuilds()
     }
-//    triggers {
-// MINUTE HOUR DOM MONTH DOW
-//        pollSCM('H 6-18/4 * * 1-5')
-//    }
+    triggers {
+// @TODO use webhooks from GitHub
+// Once in every 2 hours slot between 0900 and 1600 every Monday - Friday 
+        pollSCM('H H(8-16)/2 * * 1-5')
+    }
     stages {
-        stage('Install Local') {
-            agent {
-                docker { image 'maven:3-alpine' }
-            }
-            steps {
-                echo "IMAGE_NAME = $IMAGE_NAME"
-                sh 'mvn -B install'
-            }
-        }
-        stage('Build Image') {
+        stage('All') {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
@@ -46,15 +38,38 @@ pipeline {
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
-            steps {
-                echo 'Running Script in Declarative'
-                script {
-                    docker.withRegistry('', 'dockerhub-creds') {
+            parallel {
+                stage('Install Maven Artifact - Local') {
+                    stages{
+                        stage('Init') {
+                            steps {
+                                echo "IMAGE_NAME = $IMAGE_NAME"
+                            }    
+                        }
+                        stage('Clean') {
+                            steps {
+                                sh 'mvn -B clean'
+                            }    
+                        }
+                        stage('Install') {
+                            steps {
+                                sh 'mvn -B install'
+                            }    
+                        }
+                    }
+                }
+                stage('Build & Deploy Docker Image - Remote') {
+                    steps {
+                        echo 'Running Script in Declarative'
+                        script {
+                            docker.withRegistry('', 'dockerhub-creds') {
 
-                        def customImage = docker.build("${IMAGE_NAME}")
+                                def customImage = docker.build("${IMAGE_NAME}")
 
-                        /* Push the container to the custom Registry */
-                        customImage.push()
+                                /* Push the container to the custom Registry */
+                                customImage.push()
+                            }
+                        }
                     }
                 }
             }
@@ -62,14 +77,25 @@ pipeline {
     }
     post {
         always {
-            sh "if rm -rf target; then echo 'target dir removed'; else echo 'failed to remove target dir'; fi"
+            echo 'COMPLETED'
+            deleteDir() /* clean up workspace */
+        }
+        success {
+            echo 'SUCCESS!'
+        }
+        unstable {
+            echo 'UNSTABLE :/'
         }
         failure {
+            echo 'FAILED :('
             mail(
                 to: 'posh.bc@gmail.com', 
                 subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!", 
                 body: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:\n\nImage: ${IMAGE_NAME}\n\nCheck console output at $BUILD_URL to view the results."
             )
+        }
+        changed {
+            echo 'CHANGES MADE'
         }
     }
 }
