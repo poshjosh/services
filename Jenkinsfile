@@ -63,7 +63,7 @@ pipeline {
                         SONAR = credentials('sonar-creds') // Must have been specified in Jenkins
                     }
                     steps {
-                        sh "mvn sonar:sonar -Dsonar.login=$SONAR_USR -Dsonar.password=$SONAR_PSW"
+                        sh "mvn -B sonar:sonar -Dsonar.login=$SONAR_USR -Dsonar.password=$SONAR_PSW"
                     }
                 }
             }
