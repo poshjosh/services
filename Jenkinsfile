@@ -54,20 +54,20 @@ pipeline {
                         sh 'mvn -B install'
                     }    
                 }
-                stage('Build & Deploy Docker Image - Remote') {
-                    steps {
-                        echo 'Running Script in Declarative'
-                        script {
-                            docker.withRegistry('', 'dockerhub-creds') {
+//                stage('Build & Deploy Image') {
+//                    steps {
+//                        echo 'Running Script in Declarative'
+//                        script {
+//                            docker.withRegistry('', 'dockerhub-creds') {
 
-                                def customImage = docker.build("${IMAGE_NAME}")
+//                                def customImage = docker.build("${IMAGE_NAME}")
 
                                 /* Push the container to the custom Registry */
-                                customImage.push()
-                            }
-                        }
-                    }
-                }
+//                                customImage.push()
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }
