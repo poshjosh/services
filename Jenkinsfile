@@ -33,9 +33,9 @@ pipeline {
     stages {
         stage('All') {
             stages{
-                stage('Print Environment') {
+                stage('Print PATH') {
                     steps {
-                        sh 'printenv'
+                        echo "PATH = $PATH";
                     }    
                 }
 //                stage('Clean & Install') {
