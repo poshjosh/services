@@ -17,7 +17,7 @@ pipeline {
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE = "poshjosh/${PROJECT_NAME}";
         IMAGE_NAME = IMAGE.toLowerCase()
-        PATH = "C:\Program Files\Docker\Docker\resources\bin:$PATH"
+        PATH = "C:/Program Files/Docker/Docker/resources/bin:$PATH"
     }
     options {
         timeout(time: 1, unit: 'HOURS')
