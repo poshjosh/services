@@ -17,8 +17,6 @@ pipeline {
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE = "poshjosh/${PROJECT_NAME}";
         IMAGE_NAME = IMAGE.toLowerCase()
-//        PATH = "C:/Program Files/Docker/Docker/resources/bin:$PATH"
-//        PATH = "/usr/bin/docker:$PATH"
     }
     options {
         timeout(time: 1, unit: 'HOURS')
@@ -51,24 +49,16 @@ pipeline {
                             additionalBuildArgs "-t ${IMAGE_NAME}"
                         }
                     }
-//                    steps {
-//                        script {
-//                            docker.withRegistry('', 'dockerhub-creds') {
+                    steps {
+                        script {
+                            docker.withRegistry('', 'dockerhub-creds') {
 
-//                                def customImage = docker.build("${IMAGE_NAME}")
+                                def customImage = docker.build("${IMAGE_NAME}")
 
-//                                /* Push the container to the custom Registry */
-//                                customImage.push()
-//                            }
-//                        }
-//                    }
-//                    steps {
-//                        script {
-//                            docker.build IMAGE_NAME
-//                        }
-//                    }
-                    steps{
-                        sh "docker rmi $IMAGE_NAME"
+                                /* Push the container to the custom Registry */
+                                customImage.push()
+                            }
+                        }
                     }
                 }
             }
