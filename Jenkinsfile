@@ -45,14 +45,13 @@ pipeline {
                         sh 'mvn -B clean install'
                     }    
                 }
-//                stage('Deploy Image') {
-//                    steps {
-//                        sh '''
-//                            "docker login --username REGISTRY_USR --password REGISTRY_PSW"
-//                            "docker push $IMAGE_NAME"
-//                        '''
-//                    }
-//                }
+                stage('Deploy Image') {
+                    steps {
+                        withDockerRegistry(registryCredentialsId) {
+                            sh "docker push $IMAGE_NAME"
+                        }
+                    }
+                }
             }
         }
     }
