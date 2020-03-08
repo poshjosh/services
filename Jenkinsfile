@@ -30,42 +30,38 @@ pipeline {
     }
     stages {
         stage('All') {
-            agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                    registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
-                    additionalBuildArgs "-t ${IMAGE_NAME}"
-                }
-            }
             stages{
-                stage('Init') {
-                    steps {
-                        echo "IMAGE_NAME = $IMAGE_NAME"
-                    }    
-                }
-                stage('Clean') {
-                    steps {
-                        sh 'mvn -B clean'
-                    }    
-                }
-                stage('Install') {
+                stage('Clean & Install') {
+                    agent 'maven:3-alpine'
                     steps {
                         sh 'mvn -B install'
                     }    
                 }
-//                stage('Build & Deploy Image') {
-//                    steps {
-//                        echo 'Running Script in Declarative'
-//                        script {
-//                            docker.withRegistry('', 'dockerhub-creds') {
+                stage('Build & Deploy Image') {
+                    agent {
+                        dockerfile {
+                            filename 'Dockerfile'
+                            registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
+                            args '-v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                            additionalBuildArgs "-t ${IMAGE_NAME}"
+                        }
+                    }
+                    steps {
+                        echo 'Running Script in Declarative'
+                        script {
+                            docker.withRegistry('', 'dockerhub-creds') {
 
-//                                def customImage = docker.build("${IMAGE_NAME}")
+                                def customImage = docker.build("${IMAGE_NAME}")
 
                                 /* Push the container to the custom Registry */
-//                                customImage.push()
-//                            }
-//                        }
+                                customImage.push()
+                            }
+                        }
+                    }
+                }
+//                stage('Build Image') {
+//                    script {
+//                        docker.build IMAGE_NAME
 //                    }
 //                }
             }
