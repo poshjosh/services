@@ -45,13 +45,13 @@ pipeline {
                         sh 'mvn -B clean install'
                     }    
                 }
-                stage('Deploy Image') {
-                    steps {
-                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-                            sh "docker push $IMAGE_NAME"
-                        }
-                    }
-                }
+//                stage('Deploy Image') {
+//                    steps {
+//                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+//                            sh "docker push $IMAGE_NAME"
+//                        }
+//                    }
+//                }
             }
         }
     }
