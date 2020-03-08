@@ -33,11 +33,6 @@ pipeline {
     stages {
         stage('All') {
             stages{
-                stage('Print PATH') {
-                    steps {
-                        echo "PATH = $PATH";
-                    }    
-                }
 //                stage('Clean & Install') {
 //                    agent {
 //                        docker { image 'maven:3-alpine' }
@@ -55,29 +50,28 @@ pipeline {
                             additionalBuildArgs "-t ${IMAGE_NAME}"
                         }
                     }
-                    steps {
-                        echo 'Running Script in Declarative'
-                        script {
-                            docker.withRegistry('', 'dockerhub-creds') {
+//                    steps {
+//                        script {
+//                            docker.withRegistry('', 'dockerhub-creds') {
 
-                                def customImage = docker.build("${IMAGE_NAME}")
+//                                def customImage = docker.build("${IMAGE_NAME}")
 
-                                /* Push the container to the custom Registry */
-                                customImage.push()
-                            }
+//                                /* Push the container to the custom Registry */
+//                                customImage.push()
+//                            }
+//                        }
+//                    }
+//                    stage('Build Image') {
+//                        script {
+//                            docker.build IMAGE_NAME
+//                        }
+//                    }
+                    stage('Remove Local Image') {
+                        steps{
+                            sh "docker rmi $IMAGE_NAME"
                         }
                     }
                 }
-                stage('Remove Local Image') {
-                    steps{
-                        sh "docker rmi $IMAGE_NAME"
-                    }
-                }
-//                stage('Build Image') {
-//                    script {
-//                        docker.build IMAGE_NAME
-//                    }
-//                }
             }
         }
     }
