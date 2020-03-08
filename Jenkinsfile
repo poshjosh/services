@@ -33,6 +33,11 @@ pipeline {
     stages {
         stage('All') {
             stages{
+                stage('Print Environment') {
+                    steps {
+                        sh 'printenv'
+                    }    
+                }
 //                stage('Clean & Install') {
 //                    agent {
 //                        docker { image 'maven:3-alpine' }
@@ -78,25 +83,14 @@ pipeline {
     }
     post {
         always {
-            echo 'COMPLETED'
             deleteDir() /* clean up workspace */
         }
-        success {
-            echo 'SUCCESS!'
-        }
-        unstable {
-            echo 'UNSTABLE :/'
-        }
         failure {
-            echo 'FAILED :('
             mail(
                 to: 'posh.bc@gmail.com', 
-                subject: "$IMAGE_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!", 
-                body: "$IMAGE_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:\n\nCheck console output at $BUILD_URL to view the results."
+                subject: "$IMAGE_NAME - Build # $BUILD_NUMBER - FAILED!", 
+                body: "$IMAGE_NAME - Build # $BUILD_NUMBER - FAILED:\n\nCheck console output at ${env.BUILD_URL} to view the results."
             )
-        }
-        changed {
-            echo 'CHANGES MADE'
         }
     }
 }
