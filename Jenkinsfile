@@ -9,13 +9,15 @@
  * run, and jenkins will complain about not being able to remove the container if
  * already removed due to --rm option in args.
  */
-//def IMAGE_NAME = 'poshjosh/services:latest'
 pipeline {
     agent any
     environment {
-        IMAGE = readMavenPom().getArtifactId()
+        ARTIFACTID = readMavenPom().getArtifactId();
         VERSION = readMavenPom().getVersion()
-        IMAGE_NAME = "${IMAGE}:${VERSION}" 
+        PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
+        IMAGE = "poshjosh/${PROJECT_NAME}";
+        IMAGE_NAME = IMAGE.toLowerCase()
+        PATH = "C:/Program Files/Docker/Docker/resources/bin:$PATH"
     }
     options {
         timeout(time: 1, unit: 'HOURS')
@@ -61,6 +63,11 @@ pipeline {
                         }
                     }
                 }
+                stage('Remove Local Image') {
+                    steps{
+                        sh "docker rmi $IMAGE_NAME"
+                    }
+                }
 //                stage('Build Image') {
 //                    script {
 //                        docker.build IMAGE_NAME
@@ -84,8 +91,8 @@ pipeline {
             echo 'FAILED :('
             mail(
                 to: 'posh.bc@gmail.com', 
-                subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!", 
-                body: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:\n\nImage: ${IMAGE_NAME}\n\nCheck console output at $BUILD_URL to view the results."
+                subject: "$IMAGE_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!", 
+                body: "$IMAGE_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:\n\nCheck console output at $BUILD_URL to view the results."
             )
         }
         changed {
