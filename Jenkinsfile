@@ -41,6 +41,9 @@ pipeline {
 //                    }    
 //                }
                 stage('Build & Deploy Image') {
+                    environment {
+                        PATH = "/usr/bin/docker:$PATH"
+                    }
                     agent {
                         dockerfile {
                             filename 'Dockerfile'
