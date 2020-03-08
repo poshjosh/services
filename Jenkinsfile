@@ -68,13 +68,7 @@ pipeline {
             mail(
                 to: 'posh.bc@gmail.com', 
                 subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!", 
-                body: "
-                    $PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
-
-                    Image: ${IMAGE_NAME}
-
-                    Check console output at $BUILD_URL to view the results.
-                "
+                body: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:\n\nImage: ${IMAGE_NAME}\n\nCheck console output at $BUILD_URL to view the results."
             )
         }
     }
