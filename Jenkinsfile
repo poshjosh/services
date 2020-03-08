@@ -38,25 +38,21 @@ pipeline {
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
-            parallel {
-                stage('Install Maven Artifact - Local') {
-                    stages{
-                        stage('Init') {
-                            steps {
-                                echo "IMAGE_NAME = $IMAGE_NAME"
-                            }    
-                        }
-                        stage('Clean') {
-                            steps {
-                                sh 'mvn -B clean'
-                            }    
-                        }
-                        stage('Install') {
-                            steps {
-                                sh 'mvn -B install'
-                            }    
-                        }
-                    }
+            stages{
+                stage('Init') {
+                    steps {
+                        echo "IMAGE_NAME = $IMAGE_NAME"
+                    }    
+                }
+                stage('Clean') {
+                    steps {
+                        sh 'mvn -B clean'
+                    }    
+                }
+                stage('Install') {
+                    steps {
+                        sh 'mvn -B install'
+                    }    
                 }
                 stage('Build & Deploy Docker Image - Remote') {
                     steps {
