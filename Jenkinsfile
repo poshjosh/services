@@ -15,8 +15,8 @@ pipeline {
         ARTIFACTID = readMavenPom().getArtifactId();
         VERSION = readMavenPom().getVersion()
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
-        IMAGE = "poshjosh/${PROJECT_NAME}";
-        IMAGE_NAME = IMAGE.toLowerCase()
+        IMAGE_REF = "poshjosh/${PROJECT_NAME}";
+        IMAGE_NAME = IMAGE_REF.toLowerCase()
     }
     options {
         timeout(time: 1, unit: 'HOURS')
@@ -40,24 +40,22 @@ pipeline {
                 }
             }
             stages{
-//                stage('Clean & Install') {
-//                    steps {
-//                        sh 'mvn -B clean install'
-//                    }    
-//                }
+                stage('Clean & Install') {
+                    steps {
+                        sh 'mvn -B clean install'
+                    }    
+                }
 //                stage('Deploy Image') {
 //                    steps {
 //                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-//                            sh "docker push $IMAGE_NAME"
+//                            sh ''' 
+//                                "docker push $IMAGE_NAME"
+//                                "docker rmi $IMAGE_NAME"
+//                            '''                            
 //                        }
 //                    }
 //                }
-//                stage('Remove Local Image') {
-//                    steps {
-//                        sh "docker rmi $IMAGE_NAME"
-//                    }
-//                }
-//           }
+            }
         }
     }
     post {
