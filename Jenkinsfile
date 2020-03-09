@@ -35,7 +35,7 @@ pipeline {
                 dockerfile {
                     filename 'Dockerfile'
                     registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                    args '-v /usr/bin/docker:/usr/bin/docker -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
@@ -52,12 +52,12 @@ pipeline {
 //                        }
 //                    }
 //                }
-                stage('Remove Local Image') {
-                    steps {
-                        sh "docker rmi $IMAGE_NAME"
-                    }
-                }
-            }
+//                stage('Remove Local Image') {
+//                    steps {
+//                        sh "docker rmi $IMAGE_NAME"
+//                    }
+//                }
+//           }
         }
     }
     post {
