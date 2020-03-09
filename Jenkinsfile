@@ -36,7 +36,7 @@ pipeline {
             stages{
                 stage('Clean & Install') {
                     steps {
-                        sh 'mvn -B clean install'
+                        sh 'mvn -B clean:clean install:install'
                     }    
                 }
 //                stage('Deploy Image') {
