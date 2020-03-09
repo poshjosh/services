@@ -40,11 +40,6 @@ pipeline {
                 }
             }
             stages{
-                stage('Permissions') {
-                    steps {
-                        sh 'chmod 775 *'
-                    }
-                }
 //                stage('Clean & Install') {
 //                    steps {
 //                        sh 'mvn -B clean install'
