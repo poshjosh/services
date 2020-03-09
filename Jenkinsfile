@@ -40,10 +40,21 @@ pipeline {
                 }
             }
             stages{
-                stage('Clean & Install') {
+//                stage('Clean & Install') {
+//                    steps {
+//                        sh 'mvn -B clean install'
+//                    }    
+//                }
+                stage('Deploy Image') {
+                    environment{
+                        PATH = "/usr/bin/docker:$PATH"
+                    }
                     steps {
-                        sh 'mvn -B clean install'
-                    }    
+                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+                            echo "PATH = $PATH"
+                            sh "docker push $IMAGE_NAME"
+                        }
+                    }
                 }
 //                stage('Deploy Image') {
 //                    steps {
