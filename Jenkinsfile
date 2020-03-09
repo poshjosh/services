@@ -54,7 +54,7 @@ pipeline {
 //                }
                 stage('Remove Local Image') {
                     steps {
-                        sh "docker rmi $IMAGE_NAME"
+                        sh "./deploy.sh"
                     }
                 }
             }
