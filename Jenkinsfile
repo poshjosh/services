@@ -40,6 +40,11 @@ pipeline {
                 }
             }
             stages{
+                stage('Permissions') {
+                    steps {
+                        sh 'chmod 775 *'
+                    }
+                }
 //                stage('Clean & Install') {
 //                    steps {
 //                        sh 'mvn -B clean install'
@@ -54,7 +59,7 @@ pipeline {
 //                }
                 stage('Remove Local Image') {
                     steps {
-                        sh "./deploy.sh"
+                        sh "docker rmi $IMAGE_NAME"
                     }
                 }
             }
