@@ -2,12 +2,6 @@
 /**
  * https://github.com/poshjosh/services
  * @see https://hub.docker.com/_/maven
- *
- * Only double quoted strings support the dollar-sign ($) based string interpolation.
- *
- * Do not use --rm in args as the container will be removed by Jenkins after being
- * run, and jenkins will complain about not being able to remove the container if
- * already removed due to --rm option in args.
  */
 pipeline {
     agent any
