@@ -45,17 +45,6 @@ pipeline {
 //                        sh 'mvn -B clean install'
 //                    }    
 //                }
-                stage('Deploy Image') {
-                    environment{
-                        PATH = "/usr/bin/docker:$PATH"
-                    }
-                    steps {
-                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-                            echo "PATH = $PATH"
-                            sh "docker push $IMAGE_NAME"
-                        }
-                    }
-                }
 //                stage('Deploy Image') {
 //                    steps {
 //                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
@@ -63,6 +52,11 @@ pipeline {
 //                        }
 //                    }
 //                }
+                stage('Remove Local Image') {
+                    steps {
+                        sh "docker rmi $IMAGE_NAME"
+                    }
+                }
             }
         }
     }
