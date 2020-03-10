@@ -13,14 +13,14 @@ pipeline {
         IMAGE_NAME = IMAGE_REF.toLowerCase()
     }
     options {
-        timeout(time: 1, unit: 'HOURS')
+        timeout(time: 6, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '4'))
         skipStagesAfterUnstable()
         disableConcurrentBuilds()
     }
     triggers {
 // @TODO use webhooks from GitHub
-// Once in every 2 hours slot between 0900 and 1600 every Monday - Friday 
+// Once in every 2 hours slot between 0900 and 1600 every Monday - Friday
         pollSCM('H H(8-16)/2 * * 1-5')
     }
     stages {
@@ -29,7 +29,7 @@ pipeline {
                 dockerfile {
                     filename 'Dockerfile'
                     registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v /usr/bin/docker:/usr/bin/docker -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                    args '-v /root/.m2:/root/.m2 -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
@@ -37,18 +37,18 @@ pipeline {
                 stage('Clean & Install') {
                     steps {
                         sh 'mvn -B clean:clean install:install'
-                    }    
+                    }
                 }
-//                stage('Deploy Image') {
-//                    steps {
-//                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-//                            sh ''' 
-//                                "docker push $IMAGE_NAME"
-//                                "docker rmi $IMAGE_NAME"
-//                            '''                            
-//                        }
-//                    }
-//                }
+                stage('Deploy Image') {
+                    steps {
+                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+                            sh '''
+                                "docker push $IMAGE_NAME"
+                                "docker rmi $IMAGE_NAME"
+                            '''
+                        }
+                    }
+                }
             }
         }
     }
@@ -58,8 +58,8 @@ pipeline {
         }
         failure {
             mail(
-                to: 'posh.bc@gmail.com', 
-                subject: "$IMAGE_NAME - Build # $BUILD_NUMBER - FAILED!", 
+                to: 'posh.bc@gmail.com',
+                subject: "$IMAGE_NAME - Build # $BUILD_NUMBER - FAILED!",
                 body: "$IMAGE_NAME - Build # $BUILD_NUMBER - FAILED:\n\nCheck console output at ${env.BUILD_URL} to view the results."
             )
         }
