@@ -3,6 +3,10 @@
  * https://github.com/poshjosh/services
  * @see https://hub.docker.com/_/maven
  */
+def additionalBuildArgs = "--pull"
+if (env.BRANCH_NAME == "master") {
+    additionalBuildArgs = "--pull --no-cache"
+}
 pipeline {
     agent any
     environment {
@@ -34,7 +38,7 @@ pipeline {
             }
             steps {
                 script {
-                    customImage = docker.build("${IMAGE_NAME}")
+                    customImage = docker.build("${IMAGE_NAME}", "${additionalBuildArgs}")
                 }
             }
         }
@@ -48,6 +52,12 @@ pipeline {
             }
         }
         stage('Deploy Image') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release'
+                }
+            }
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub-creds') { // Must have been specified in Jenkins
