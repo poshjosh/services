@@ -13,6 +13,7 @@ pipeline {
         IMAGE_NAME = IMAGE_REF.toLowerCase()
     }
     options {
+        timestamps()
         timeout(time: 6, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '4'))
         skipStagesAfterUnstable()
