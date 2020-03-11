@@ -14,7 +14,7 @@ pipeline {
     }
     options {
         timestamps()
-        timeout(time: 6, unit: 'HOURS')
+        timeout(time: 30, unit: 'MINUTES')
         buildDiscarder(logRotator(numToKeepStr: '4'))
         skipStagesAfterUnstable()
         disableConcurrentBuilds()
@@ -51,6 +51,7 @@ pipeline {
                         PATH = "/usr/bin/docker:$PATH"
                     }
                     steps {
+                        echo "PATH = $PATH"
                         withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
                             sh '''
                                 "docker push $IMAGE_NAME"
