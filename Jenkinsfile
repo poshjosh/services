@@ -70,10 +70,7 @@ pipeline {
         }
         stage('Deploy Image') {
             when {
-                anyOf {
-                    branch 'master'
-                    branch 'release'
-                }
+                branch 'master'
             }
             steps {
                 script {
