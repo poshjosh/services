@@ -24,7 +24,7 @@ pipeline {
         pollSCM('H H(8-16)/2 * * 1-5')
     }
     stages {
-        stage('All') {
+        stage('Install Artifact & Deploy Image') {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
