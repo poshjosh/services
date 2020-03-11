@@ -30,7 +30,7 @@ pipeline {
                 dockerfile {
                     filename 'Dockerfile'
                     registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                    args '-v /usr/bin/docker:/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
@@ -52,21 +52,19 @@ pipeline {
                     }
                     steps {
                         echo "PATH = $PATH"
-//                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-//                            sh '''
-//                                "docker push $IMAGE_NAME"
-//                                "docker rmi $IMAGE_NAME"
-//                            '''
-//                        }
-                        script {
-                            docker.withRegistry('', 'dockerhub-creds') {
-
-                                def customImage = docker.build("${IMAGE_NAME}")
-
-                                /* Push the container to the custom Registry */
-                                customImage.push()
-                            }
+                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+                            sh '''
+                                "docker push $IMAGE_NAME"
+                                "docker rmi $IMAGE_NAME"
+                            '''
                         }
+//                        script {
+//                            docker.withRegistry('', 'dockerhub-creds') {
+//                                def customImage = docker.build("${IMAGE_NAME}")
+//                                /* Push the container to the custom Registry */
+//                                customImage.push()
+//                            }
+//                        }
                     }
                 }
             }
