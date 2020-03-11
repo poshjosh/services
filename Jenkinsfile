@@ -38,7 +38,7 @@ pipeline {
                     if (env.BRANCH_NAME == "master") {
                         additionalBuildArgs = "--pull --no-cache"
                     }
-                    docker.build("${IMAGE_NAME}")
+                    docker.build("${IMAGE_NAME}", "${additionalBuildArgs} .")
                 }
             }
         }
