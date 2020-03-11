@@ -24,8 +24,9 @@ WORKDIR /usr/src/app
 # ---------------
 # Install maven dependency packages (keep in image)
 # ---------------
-# COPY pom.xml /usr/src/app
+ COPY pom.xml /usr/src/app
 # RUN mvn -B -f /usr/src/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
+RUN mvn -B -f /usr/src/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml 
 # ---------------
 # Copy other source files (keep in image) - Not applicable to pom projects
 # ---------------
