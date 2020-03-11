@@ -48,7 +48,7 @@ pipeline {
                         DOCKER_TLS_VERIFY = 1
                     }
                     steps {
-                        echo "PATH = $PATH"
+                        echo "BUILD_NUMBER = $BUILD_NUMBER"
                         withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
                             sh '''
                                 "docker push $IMAGE_NAME"
