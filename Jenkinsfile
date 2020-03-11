@@ -29,7 +29,7 @@ pipeline {
                 dockerfile {
                     filename 'Dockerfile'
                     registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                    args '-v /usr/bin/docker:/usr/bin/docker -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
@@ -37,6 +37,7 @@ pipeline {
                 stage('Echo') {
                     steps{
                         echo "HOME = $HOME"
+                        echo "PATH = $PATH"
                     }
                 }
                 stage('Clean & Install') {
