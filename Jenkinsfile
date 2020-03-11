@@ -42,7 +42,7 @@ pipeline {
                         }
                     }
                     environment {
-                        PATH = "/usr/bin/docker:$PATH"
+//                        PATH = "/usr/bin/docker:$PATH"
                         DOCKER_HOST = 'tcp://docker:2376'
                         DOCKER_CERT_PATH = '/certs/client'
                         DOCKER_TLS_VERIFY = '1'
@@ -50,30 +50,30 @@ pipeline {
                     steps {
                         echo "BUILD_NUMBER = $BUILD_NUMBER"
 //                        sh "docker push $IMAGE_NAME"
-                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-                            sh '''
-                                "docker push $IMAGE_NAME"
-                                "docker rmi $IMAGE_NAME"
-                            '''
-                        }
+//                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+//                            sh '''
+//                                "docker push $IMAGE_NAME"
+//                                "docker rmi $IMAGE_NAME"
+//                            '''
+//                        }
 //                        withDockerContainer(image: "$IMAGE_NAME") {
 //                            sh '''
 //                                "docker push $IMAGE_NAME"
 //                                  "docker rmi $IMAGE_NAME"
 //                            '''
 //                        }
-//                        script {
-//                            docker.image("$IMAGE_NAME").inside {
-//                                sh '''
-//                                    "docker push $IMAGE_NAME"
-//                                    "docker rmi $IMAGE_NAME"
-//                                '''
-//                            }
+                        script {
+                            docker.image("$IMAGE_NAME").inside {
+                                sh '''
+                                    "docker push $IMAGE_NAME"
+                                    "docker rmi $IMAGE_NAME"
+                                '''
+                            }
 //                            docker.withRegistry('', 'dockerhub-creds') {
 //                                def customImage = docker.build("${IMAGE_NAME}")
 //                                customImage.push()
 //                            }
-//                        }
+                        }
                     }
                 }
             }
