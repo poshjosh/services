@@ -18,6 +18,7 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '4'))
         skipStagesAfterUnstable()
         disableConcurrentBuilds()
+        skipDefaultCheckout()
     }
     triggers {
 // @TODO use webhooks from GitHub
@@ -27,17 +28,16 @@ pipeline {
     stages {
         stage('Checkout SCM') {
             steps {
-                    checkout(
-                        $class: 'GitSCM',
-                        branches: [[name: '**']],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [],
-                        submoduleCfg: [],
-                        userRemoteConfigs: [
-                            [
-                                credentialsId: 'dockerhub-creds',
-                                url: 'https://github.com/poshjosh/services.git'
-                            ]
+                checkout(
+                    $class: 'GitSCM',
+                    branches: [[name: '**']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [
+                        [
+                            credentialsId: 'dockerhub-creds',
+                            url: 'https://github.com/poshjosh/services.git'
                         ]
                     ]
                 )
