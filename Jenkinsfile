@@ -52,9 +52,9 @@ pipeline {
             }
         }
         stage('Deploy Image') {
-            when {
-                branch 'master'
-            }
+//            when {
+//                branch 'master'
+//            }
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub-creds') { // Must have been specified in Jenkins
