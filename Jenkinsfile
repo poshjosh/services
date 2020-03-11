@@ -18,7 +18,6 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '4'))
         skipStagesAfterUnstable()
         disableConcurrentBuilds()
-//        skipDefaultCheckout()
     }
     triggers {
 // @TODO use webhooks from GitHub
@@ -29,7 +28,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    def additionalBuildArgs = "--pull --no-cache"
+                    def additionalBuildArgs = "--pull"
                     if (env.BRANCH_NAME == "master") {
                         additionalBuildArgs = "--pull --no-cache"
                     }
