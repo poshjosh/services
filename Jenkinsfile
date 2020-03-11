@@ -27,14 +27,9 @@ pipeline {
     }
     stages {
         stage('Build Image') {
-            environment {
-                DOCKER_HOST = 'tcp://docker:2376'
-                DOCKER_CERT_PATH = '/certs/client'
-                DOCKER_TLS_VERIFY = '1'
-            }
             steps {
                 script {
-                    def additionalBuildArgs = "--pull"
+                    def additionalBuildArgs = "--pull --no-cache"
                     if (env.BRANCH_NAME == "master") {
                         additionalBuildArgs = "--pull --no-cache"
                     }
@@ -52,9 +47,9 @@ pipeline {
             }
         }
         stage('Deploy Image') {
-//            when {
-//                branch 'master'
-//            }
+            when {
+                branch 'master'
+            }
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub-creds') { // Must have been specified in Jenkins
