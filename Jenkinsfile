@@ -3,10 +3,6 @@
  * https://github.com/poshjosh/services
  * @see https://hub.docker.com/_/maven
  */
-def additionalBuildArgs = "--pull"
-if (env.BRANCH_NAME == "master") {
-    additionalBuildArgs = "--pull --no-cache"
-}
 pipeline {
     agent any
     environment {
@@ -29,7 +25,24 @@ pipeline {
         pollSCM('H H(8-16)/2 * * 1-5')
     }
     stages {
-        def customImage
+        stage('Checkout SCM') {
+            steps {
+                    checkout(
+                        $class: 'GitSCM',
+                        branches: [[name: '**']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [
+                            [
+                                credentialsId: 'dockerhub-creds',
+                                url: 'https://github.com/poshjosh/services.git'
+                            ]
+                        ]
+                    ]
+                )
+            }
+        }
         stage('Build Image') {
             environment {
                 DOCKER_HOST = 'tcp://docker:2376'
@@ -38,7 +51,11 @@ pipeline {
             }
             steps {
                 script {
-                    customImage = docker.build("${IMAGE_NAME}", "${additionalBuildArgs}")
+                    def additionalBuildArgs = "--pull"
+                    if (env.BRANCH_NAME == "master") {
+                        additionalBuildArgs = "--pull --no-cache"
+                    }
+                    docker.build("${IMAGE_NAME}", "${additionalBuildArgs}")
                 }
             }
         }
@@ -61,7 +78,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub-creds') { // Must have been specified in Jenkins
-                        customImage.push()
+                        sh "docker push ${IMAGE_NAME}"
                     }
                 }
             }
