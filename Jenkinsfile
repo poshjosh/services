@@ -61,6 +61,7 @@ pipeline {
     post {
         always {
             deleteDir() /* clean up workspace */
+            sh "docker system prune -af --volumes"
         }
         failure {
             mail(
