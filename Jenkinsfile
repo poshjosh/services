@@ -52,11 +52,20 @@ pipeline {
                     }
                     steps {
                         echo "PATH = $PATH"
-                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-                            sh '''
-                                "docker push $IMAGE_NAME"
-                                "docker rmi $IMAGE_NAME"
-                            '''
+//                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+//                            sh '''
+//                                "docker push $IMAGE_NAME"
+//                                "docker rmi $IMAGE_NAME"
+//                            '''
+//                        }
+                        script {
+                            docker.withRegistry('', 'dockerhub-creds') {
+
+                                def customImage = docker.build("${IMAGE_NAME}")
+
+                                /* Push the container to the custom Registry */
+                                customImage.push()
+                            }
                         }
                     }
                 }
