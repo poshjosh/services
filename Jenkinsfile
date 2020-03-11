@@ -43,19 +43,24 @@ pipeline {
                 stage('Deploy Image') {
                     environment {
                         PATH = "/usr/bin/docker:$PATH"
-                        DOCKER_HOST = "tcp://docker:2376"
-                        DOCKER_CERT_PATH = "/certs/client"
-                        DOCKER_TLS_VERIFY = 1
+                        DOCKER_HOST = 'tcp://docker:2376'
+                        DOCKER_CERT_PATH = '/certs/client'
+                        DOCKER_TLS_VERIFY = '1'
                     }
                     steps {
                         echo "BUILD_NUMBER = $BUILD_NUMBER"
-                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-                            sh '''
-                                "ls -a"
-                                "docker push $IMAGE_NAME"
-                                "docker rmi $IMAGE_NAME"
-                            '''
-                        }
+                        sh '''
+                            "ls -a"
+                            "docker push $IMAGE_NAME"
+                            "docker rmi $IMAGE_NAME"
+                        '''
+//                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+//                            sh '''
+//                                "ls -a"
+//                                "docker push $IMAGE_NAME"
+//                                "docker rmi $IMAGE_NAME"
+//                            '''
+//                        }
 //                        script {
 //                            docker.withRegistry('', 'dockerhub-creds') {
 //                                def customImage = docker.build("${IMAGE_NAME}")
