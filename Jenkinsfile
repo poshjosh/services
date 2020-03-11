@@ -29,7 +29,7 @@ pipeline {
                 dockerfile {
                     filename 'Dockerfile'
                     registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v /usr/bin/docker:/usr/bin/docker -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                    args '-v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
@@ -46,6 +46,9 @@ pipeline {
                     }
                 }
                 stage('Deploy Image') {
+                    environment {
+                        PATH = "/usr/bin/docker:$PATH"
+                    }
                     steps {
                         withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
                             sh '''
