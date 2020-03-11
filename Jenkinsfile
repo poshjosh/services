@@ -56,6 +56,12 @@ pipeline {
 //                                "docker rmi $IMAGE_NAME"
 //                            '''
 //                        }
+                        withDockerContainer(image: "$IMAGE_NAME") {
+                            sh '''
+                                "docker push $IMAGE_NAME"
+                                  "docker rmi $IMAGE_NAME"
+                            '''
+                        }
                         script {
                             docker.withRegistry('', 'dockerhub-creds') {
                                 def customImage = docker.build("${IMAGE_NAME}")
