@@ -49,11 +49,7 @@ pipeline {
                     }
                     steps {
                         echo "BUILD_NUMBER = $BUILD_NUMBER"
-                        sh '''
-                            "ls -a"
-                            "docker push $IMAGE_NAME"
-                            "docker rmi $IMAGE_NAME"
-                        '''
+                        sh "docker push $IMAGE_NAME"
 //                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
 //                            sh '''
 //                                "ls -a"
