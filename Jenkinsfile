@@ -49,21 +49,20 @@ pipeline {
                     }
                     steps {
                         echo "BUILD_NUMBER = $BUILD_NUMBER"
-                        sh "docker push $IMAGE_NAME"
+//                        sh "docker push $IMAGE_NAME"
 //                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
 //                            sh '''
-//                                "ls -a"
 //                                "docker push $IMAGE_NAME"
 //                                "docker rmi $IMAGE_NAME"
 //                            '''
 //                        }
-//                        script {
-//                            docker.withRegistry('', 'dockerhub-creds') {
-//                                def customImage = docker.build("${IMAGE_NAME}")
-//                                /* Push the container to the custom Registry */
-//                                customImage.push()
-//                            }
-//                        }
+                        script {
+                            docker.withRegistry('', 'dockerhub-creds') {
+                                def customImage = docker.build("${IMAGE_NAME}")
+                                /* Push the container to the custom Registry */
+                                customImage.push()
+                            }
+                        }
                     }
                 }
             }
