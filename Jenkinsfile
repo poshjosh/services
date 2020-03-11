@@ -26,9 +26,8 @@ pipeline {
     stages {
         stage('All') {
             agent {
-                docker {
-                    image 'maven:3-alpine'
-//                    filename 'Dockerfile'
+                dockerfile {
+                    filename 'Dockerfile'
                     registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
                     args '-v /root/.m2:/root/.m2 -v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
                     additionalBuildArgs "-t ${IMAGE_NAME}"
