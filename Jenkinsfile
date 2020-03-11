@@ -25,21 +25,21 @@ pipeline {
         pollSCM('H H(8-16)/2 * * 1-5')
     }
     stages {
-        stage('Install Artifact & Deploy Image') {
+        stage('Build Image') {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
                     registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v jenkins-data:/var/jenkins_home -v /usr/bin/docker:/usr/bin/docker -v "$HOME":/home -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                    args '--network jenkins -v jenkins-data:/var/jenkins_home -v jenkins-docker-certs:/certs/client:ro -v /usr/bin/docker:/usr/bin/docker -v "$HOME":/home -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
                     additionalBuildArgs "-t ${IMAGE_NAME}"
                 }
             }
             stages{
-                stage('Clean & Install') {
-                    steps {
-                        sh 'mvn -B clean:clean install:install'
-                    }
-                }
+//                stage('Clean & Install') {
+//                    steps {
+//                        sh 'mvn -B clean:clean install:install'
+//                    }
+//                }
                 stage('Deploy Image') {
                     environment {
                         PATH = "/usr/bin/docker:$PATH"
