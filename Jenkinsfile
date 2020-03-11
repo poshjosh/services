@@ -35,12 +35,6 @@ pipeline {
                 }
             }
             stages{
-                stage('Echo') {
-                    steps{
-                        echo "HOME = $HOME"
-                        echo "PATH = $PATH"
-                    }
-                }
                 stage('Clean & Install') {
                     steps {
                         sh 'mvn -B clean:clean install:install'
