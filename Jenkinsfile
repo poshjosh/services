@@ -26,14 +26,6 @@ pipeline {
     }
     stages {
         stage('Build Image') {
-            agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                    registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
-                    args '-v jenkins-data:/var/jenkins_home -v jenkins-docker-certs:/certs/client:ro -v /usr/bin/docker:/usr/bin/docker -v "$HOME":/home -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
-                    additionalBuildArgs "-t ${IMAGE_NAME}"
-                }
-            }
             stages{
 //                stage('Clean & Install') {
 //                    steps {
@@ -41,6 +33,14 @@ pipeline {
 //                    }
 //                }
                 stage('Deploy Image') {
+                    agent {
+                        dockerfile {
+                            filename 'Dockerfile'
+                            registryCredentialsId 'dockerhub-creds' // Must have been specified in Jenkins
+                            args '-v jenkins-data:/var/jenkins_home -v jenkins-docker-certs:/certs/client:ro -v /usr/bin/docker:/usr/bin/docker -v "$HOME":/home -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD":/usr/src/app -v /home/.m2:/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+                            additionalBuildArgs "-t ${IMAGE_NAME}"
+                        }
+                    }
                     environment {
                         PATH = "/usr/bin/docker:$PATH"
                         DOCKER_HOST = 'tcp://docker:2376'
@@ -50,30 +50,30 @@ pipeline {
                     steps {
                         echo "BUILD_NUMBER = $BUILD_NUMBER"
 //                        sh "docker push $IMAGE_NAME"
-//                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
-//                            sh '''
-//                                "docker push $IMAGE_NAME"
-//                                "docker rmi $IMAGE_NAME"
-//                            '''
-//                        }
+                        withDockerRegistry([url: '', credentialsId: 'dockerhub-creds']) {
+                            sh '''
+                                "docker push $IMAGE_NAME"
+                                "docker rmi $IMAGE_NAME"
+                            '''
+                        }
 //                        withDockerContainer(image: "$IMAGE_NAME") {
 //                            sh '''
 //                                "docker push $IMAGE_NAME"
 //                                  "docker rmi $IMAGE_NAME"
 //                            '''
 //                        }
-                        script {
-                            docker.image("$IMAGE_NAME").inside {
-                                sh '''
-                                    "docker push $IMAGE_NAME"
-                                    "docker rmi $IMAGE_NAME"
-                                '''
-                            }
+//                        script {
+//                            docker.image("$IMAGE_NAME").inside {
+//                                sh '''
+//                                    "docker push $IMAGE_NAME"
+//                                    "docker rmi $IMAGE_NAME"
+//                                '''
+//                            }
 //                            docker.withRegistry('', 'dockerhub-creds') {
 //                                def customImage = docker.build("${IMAGE_NAME}")
 //                                customImage.push()
 //                            }
-                        }
+//                        }
                     }
                 }
             }
