@@ -38,7 +38,11 @@ pipeline {
         }
         stage('Clean & Install') {
             steps {
-                sh 'mvn -B clean:clean install:install'
+                script{
+                    docker.image("${IMAGE_NAME}").inside{
+                        sh 'mvn -B clean:clean install:install'
+                    }
+                }
             }
         }
         stage('Deploy Image') {
