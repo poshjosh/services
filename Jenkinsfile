@@ -62,18 +62,18 @@ pipeline {
 //                                  "docker rmi $IMAGE_NAME"
 //                            '''
 //                        }
-                        docker.image("$IMAGE_NAME").inside {
-                            sh '''
-                                "docker push $IMAGE_NAME"
-                                "docker rmi $IMAGE_NAME"
-                            '''
-                        }
-//                        script {
+                        script {
+                            docker.image("$IMAGE_NAME").inside {
+                                sh '''
+                                    "docker push $IMAGE_NAME"
+                                    "docker rmi $IMAGE_NAME"
+                                '''
+                            }
 //                            docker.withRegistry('', 'dockerhub-creds') {
 //                                def customImage = docker.build("${IMAGE_NAME}")
 //                                customImage.push()
 //                            }
-//                        }
+                        }
                     }
                 }
             }
