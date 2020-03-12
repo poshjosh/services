@@ -11,7 +11,7 @@ pipeline {
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE_REF = "poshjosh/${PROJECT_NAME}";
         IMAGE_NAME = IMAGE_REF.toLowerCase()
-        RUN_ARGS = '-v "$PWD":/usr/src/app -v "/home/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
+        RUN_ARGS = '-v "/home/.m2":/root/.m2'
     }
     options {
         timestamps()
