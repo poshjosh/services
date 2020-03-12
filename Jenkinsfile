@@ -11,7 +11,7 @@ pipeline {
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE_REF = "poshjosh/${PROJECT_NAME}";
         IMAGE_NAME = IMAGE_REF.toLowerCase()
-        RUN_ARGS = '-v "/home/.m2":/root/.m2'
+        RUN_ARGS = '-v "/root/.m2":/root/.m2'
     }
     options {
         timestamps()
@@ -61,8 +61,8 @@ pipeline {
     }
     post {
         always {
-            deleteDir() /* clean up workspace */
-            sh "docker system prune -f --volumes"
+//            deleteDir() /* clean up workspace */
+//            sh "docker system prune -f --volumes"
         }
         failure {
             mail(
