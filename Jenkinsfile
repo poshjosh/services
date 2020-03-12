@@ -11,6 +11,7 @@ pipeline {
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE_REF = "poshjosh/${PROJECT_NAME}";
         IMAGE_NAME = IMAGE_REF.toLowerCase()
+        RUN_ARGS = '-v "$PWD":/usr/src/app -v "$HOME/.m2":/root/.m2 -v "$PWD/target:/usr/src/app/target" -w /usr/src/app'
     }
     options {
         timestamps()
@@ -39,7 +40,7 @@ pipeline {
         stage('Clean & Install') {
             steps {
                 script{
-                    docker.image("${IMAGE_NAME}").inside{
+                    docker.image("${IMAGE_NAME}").inside("${RUN_ARGS}"){
                         sh 'mvn -B clean:clean install:install'
                     }
                 }
