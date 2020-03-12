@@ -60,10 +60,10 @@ pipeline {
         }
     }
     post {
-        always {
+//        always {
 //            deleteDir() /* clean up workspace */
 //            sh "docker system prune -f --volumes"
-        }
+//        }
         failure {
             mail(
                 to: 'posh.bc@gmail.com',
