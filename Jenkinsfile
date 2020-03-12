@@ -3,17 +3,19 @@
  * https://github.com/poshjosh/services
  * @see https://hub.docker.com/_/maven
  */
+def IMAGE_NAME = 'poshjosh/services:latest'
 pipeline {
     agent {
-        dockerfile true
-//        additionalBuildArgs "-t ${IMAGE_NAME}"
+        dockerfile {
+            additionalBuildArgs "-t ${IMAGE_NAME}"
+        }
     }
     environment {
         ARTIFACTID = readMavenPom().getArtifactId();
         VERSION = readMavenPom().getVersion()
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE_REF = "poshjosh/${PROJECT_NAME}";
-        IMAGE_NAME = IMAGE_REF.toLowerCase()
+//        IMAGE_NAME = IMAGE_REF.toLowerCase()
     }
     options {
         timestamps()
