@@ -3,19 +3,14 @@
  * https://github.com/poshjosh/services
  * @see https://hub.docker.com/_/maven
  */
-def IMAGE_NAME = 'poshjosh/services:latest'
 pipeline {
-    agent {
-        docker {
-            additionalBuildArgs "-t ${IMAGE_NAME}"
-        }
-    }
+    agent any
     environment {
         ARTIFACTID = readMavenPom().getArtifactId();
         VERSION = readMavenPom().getVersion()
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE_REF = "poshjosh/${PROJECT_NAME}";
-//        IMAGE_NAME = IMAGE_REF.toLowerCase()
+        IMAGE_NAME = IMAGE_REF.toLowerCase()
     }
     options {
         timestamps()
@@ -30,9 +25,24 @@ pipeline {
         pollSCM('H H(8-16)/2 * * 1-5')
     }
     stages {
+        stage('Build Image') {
+            steps {
+                script {
+                    def additionalBuildArgs = "--pull"
+                    if (env.BRANCH_NAME == "master") {
+                        additionalBuildArgs = "--pull --no-cache"
+                    }
+                    docker.build("${IMAGE_NAME}", "${additionalBuildArgs} .")
+                }
+            }
+        }
         stage('Clean & Install') {
             steps {
-                sh 'mvn -B clean:clean install:install'
+                script{
+                    docker.image("${IMAGE_NAME}").inside{
+                        sh 'mvn -B clean:clean install:install'
+                    }
+                }
             }
         }
         stage('Deploy Image') {
