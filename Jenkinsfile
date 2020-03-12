@@ -6,7 +6,7 @@
 pipeline {
     agent {
         dockerfile true
-        additionalBuildArgs "-t ${IMAGE_NAME}"
+//        additionalBuildArgs "-t ${IMAGE_NAME}"
     }
     environment {
         ARTIFACTID = readMavenPom().getArtifactId();
