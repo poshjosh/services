@@ -6,7 +6,7 @@
 def IMAGE_NAME = 'poshjosh/services:latest'
 pipeline {
     agent {
-        dockerfile {
+        docker {
             additionalBuildArgs "-t ${IMAGE_NAME}"
         }
     }
