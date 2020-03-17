@@ -11,7 +11,7 @@ pipeline {
         PROJECT_NAME = "${ARTIFACTID}:${VERSION}"
         IMAGE_REF = "poshjosh/${PROJECT_NAME}";
         IMAGE_NAME = IMAGE_REF.toLowerCase()
-        RUN_ARGS = '-v "/root/.m2":/root/.m2'
+        RUN_ARGS = '-v "/home/.m2":/root/.m2'
     }
     options {
         timestamps()
@@ -60,10 +60,22 @@ pipeline {
         }
     }
     post {
-//        always {
-//            deleteDir() /* clean up workspace */
-//            sh "docker system prune -f --volumes"
-//        }
+        always {
+            script{
+                retry(3) {
+                    try {
+                        timeout(time: 60, unit: 'SECONDS') {
+                            deleteDir() // Clean up workspace
+                        } 
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                        // we re-throw as a different error, that would not 
+                        // cause retry() to fail (workaround for issue JENKINS-51454)
+                        error 'Timeout!'
+                    } 
+                } // retry ends
+            }
+            sh "docker system prune -f"
+        }
         failure {
             mail(
                 to: 'posh.bc@gmail.com',
