@@ -121,6 +121,10 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
+            <resource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </resource>
         </resources>        
         <plugins>
             <plugin>
@@ -176,6 +180,7 @@
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <skip>${tests.skip}</skip>
+                    <useSystemClassLoader>false</useSystemClassLoader>
                 </configuration>                
             </plugin>
             <plugin>
@@ -256,130 +261,6 @@
             <properties>
                 <activatedProfile>prod</activatedProfile>
             </properties>
-        </profile>
-        <profile>
-            <id>fabric8</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>build.env</name>
-                    <value>fabric8</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.31.0</version>
-                        <executions>
-                            <execution>
-                                <id>start</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                    <goal>start</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <skip>${it.skip}</skip>
-                            <images>
-                                <image>
-                                    <name>${project.groupId}/${project.artifactId}:${project.version}</name>
-                                    <build>
-                                        <dockerFile>${project.basedir}/Dockerfile</dockerFile >
-                                    </build>
-                                    <run>
-                                        <ports>
-                                            <port>${app.port}:${app.port}</port>
-                                        </ports>
-                                        <wait>
-                                            <!-- Wait for this URL to return a 200 return code -->
-                                            <url>http://localhost:${app.port}</url>
-                                            <time>120000</time>
-                                        </wait>     
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
-                    </plugin>                    
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>dockermaven</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>build.env</name>
-                    <value>dockermaven</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-<!-- maven-dependency-plugin and exec-maven-plugin are used to build docker image -->            
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>enforce</goal>
-                                    <goal>copy</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>${project.groupId}</groupId>
-                                            <artifactId>${project.artifactId}</artifactId>
-                                            <version>${project.version}</version>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>target/dependency</outputDirectory>
-                                            <destFileName>app.jar</destFileName>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>        
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.6.0</version>
-                        <executions>
-                            <execution>
-                                <id>docker-package</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>enforce</goal>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>docker</executable>
-                                    <workingDirectory>${project.basedir}</workingDirectory>
-                                    <arguments>
-                                        <argument>build</argument>
-                                        <argument>.</argument>
-                                        <argument>-t</argument>
-                                        <argument>${project.groupId}/${project.artifactId}:${project.version}</argument>
-                                        <argument>--build-arg</argument>
-                                        <argument>JAR_FILE=target/dependency/app.jar</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>            
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>
