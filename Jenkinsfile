@@ -13,4 +13,4 @@ library(
     )
 )
 
-pipelineForMavenDockerfile(gitUrl : 'https://github.com/poshjosh/services.git')
+pipelineForMavenDockerfile()
