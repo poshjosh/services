@@ -1,7 +1,6 @@
 #!/usr/bin/env groovy
 /**
  * https://github.com/poshjosh/services
- * @see https://hub.docker.com/_/maven
  */
 library(
     identifier: 'jenkins-shared-library@master',
