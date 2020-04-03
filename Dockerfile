@@ -3,10 +3,6 @@
 # ---------------
 FROM maven:3-alpine
 LABEL maintaner="posh.bc@gmail.com"
-# Create and use non-root user
-# ----------------------------
-RUN addgroup -S poshjosh && adduser -S poshjosh -G poshjosh
-USER poshjosh
 # Speed up Maven a bit
 # --------------------
 ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
@@ -15,6 +11,10 @@ ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 # make source folder
 # ------------------
 RUN mkdir -p /usr/src/app
+# Create and use non-root user
+# ----------------------------
+RUN addgroup -S poshjosh && adduser -S poshjosh -G poshjosh
+USER poshjosh
 WORKDIR /usr/src/app
 # Install maven dependency packages (keep in image).
 # Create a pre-packaged repository by using our pom.xml and settings file
