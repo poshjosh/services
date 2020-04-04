@@ -12,4 +12,4 @@ library(
     )
 )
 
-pipelineForMavenDockerfile()
+pipelineForMaven()
